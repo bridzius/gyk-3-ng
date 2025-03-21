@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { TaskComponent } from './task/task.component';
 import { Task } from '../types';
 import { TasksService } from '../tasks.service';
 import { Router, RouterLink, RouterLinkWithHref } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -24,9 +24,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     </ul>
   `,
 })
-export class TasksComponent {
+export class TasksComponent implements OnInit {
   private tasksService = inject(TasksService);
-  taskai: Observable<Task[]> = this.tasksService.getTasks();
+  private destroyRef = inject(DestroyRef);
+  taskai: Observable<Task[]> = this.tasksService.tasks$;
+
+  ngOnInit(): void {
+    this.tasksService
+      .getTasks()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+  }
 
   pridek() {
     this.tasksService
@@ -34,8 +42,7 @@ export class TasksComponent {
         text: 'Naujas taskas',
         date: new Date(),
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(take(1))
       .subscribe();
-    this.taskai = this.tasksService.getTasks();
   }
 }
