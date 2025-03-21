@@ -5,6 +5,7 @@ import { TasksService } from '../tasks.service';
 import { Router, RouterLink, RouterLinkWithHref } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-tasks',
@@ -33,6 +34,7 @@ export class TasksComponent {
         text: 'Naujas taskas',
         date: new Date(),
       })
+      .pipe(takeUntilDestroyed())
       .subscribe();
     this.taskai = this.tasksService.getTasks();
   }
