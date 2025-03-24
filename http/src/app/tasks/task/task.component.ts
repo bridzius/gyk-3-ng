@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 import {
   CurrencyPipe,
   DatePipe,
@@ -12,10 +12,10 @@ import { Task } from '../../types';
   selector: 'app-task',
   imports: [UpperCasePipe, DatePipe],
   template: `
-    <p>{{ task.text | uppercase }}</p>
-    <p>{{ task.date | date }}</p>
+    <p>{{ task().text | uppercase }}</p>
+    <p>{{ task().date | date }}</p>
   `,
 })
 export class TaskComponent {
-  @Input() task!: Task;
+  task = input.required<Task>();
 }

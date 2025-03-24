@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Signal } from '@angular/core';
 import { TaskComponent } from './task/task.component';
 import { Task } from '../types';
 import { TasksService } from '../tasks.service';
@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     <h1>Mano šiandienos užduotys:</h1>
     <button (click)="pridek()">Pridek naują task</button>
     <ul>
-      @for (taskas of taskai | async; track $index) {
+      @for (taskas of taskai(); track $index) {
       <li>
         <a routerLink="/tasks/{{ taskas.id }}"
           ><app-task [task]="taskas"></app-task
@@ -27,7 +27,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class TasksComponent implements OnInit {
   private tasksService = inject(TasksService);
   private destroyRef = inject(DestroyRef);
-  taskai: Observable<Task[]> = this.tasksService.tasks$;
+  taskai: Signal<Task[]> = this.tasksService.tasksSignal;
 
   ngOnInit(): void {
     this.tasksService

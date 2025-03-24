@@ -1,8 +1,9 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Task } from './types';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subject, switchMap, tap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +15,12 @@ export class TasksService {
 
   private tasksSubject = new BehaviorSubject<Task[]>([]);
   tasks$ = this.tasksSubject.asObservable();
+  tasksSignal = signal<Required<Task[]>>([]);
 
   getTasks() {
     return this.http
       .get<Required<Task>[]>(this.tasksUrl)
-      .pipe(tap((tasks) => this.tasksSubject.next(tasks)));
+      .pipe(tap((tasks) => this.tasksSignal.set(tasks)));
   }
 
   addTask(task: Task) {
@@ -31,6 +33,6 @@ export class TasksService {
   }
 
   getTaskById(id: string) {
-    return this.http.get<Task>(`${this.tasksUrl}/${id}`);
+    return toSignal<Task>(this.http.get<Task>(`${this.tasksUrl}/${id}`));
   }
 }
